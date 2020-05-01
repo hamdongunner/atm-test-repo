@@ -11,17 +11,32 @@ mongoose.connect("mongodb://Mays:maysmlab1@ds363118.mlab.com:63118/atm-db").then
 
 const atmSchema = new mongoose.Schema({
     name: {type: String , required: true , minlength: 2 , maxlength: 10},
-    location: String,
-    creationDate: {type: Date ,default: Date.now}
+    creationDate: {type: Date ,default: Date.now},
+    haveCash: Boolean,
+    working: Boolean,
+    country: String,
+    city: String,
+    address: String,
+    loc: {
+        type: String,
+        coordinates: [Number]
+  }
 });
 
 const AtmCollection2 = mongoose.model("AtmCollection2",atmSchema);
 
 /*
 AtmCollection2.create({
-    atmName: "A1",
-    location: "Erbil"
-},function(error,data){
+    name: "A1",
+    haveCash: "yes",
+    working: "yes",
+    country: "Iraq",
+    city: "Baghdad",
+    address: "Ziyona",
+    loc: {
+        type: "Point",
+        coordinates:  [ 33.3221,//latitude 44.4512 //longitude ]
+    }},function(error,data){
     if(error){
         console.log(error);
     }else{
@@ -30,10 +45,11 @@ AtmCollection2.create({
 });
 */
 
-app.get("/api/atms/:id", (req, res) => {
-    const atm = AtmCollection2.findById(req.params.id)
-    if (!atm) return res.status(404).send('The ATM with the specific ID is not found!!');
-    res.send(atm);
+app.get("/api/singleAtm/:id", (req, res) => {
+    const singleAtm = AtmCollection2.findById(req.params.id);
+    if (!singleAtm) return res.status(404).send("The ATM with the specific ID is not found!!");
+    res.send(singleAtm);
+
   });
 
 
@@ -43,13 +59,24 @@ app.get("/api/atms",async (req,res)=>{
 });
 
 
-app.post("/api/atms",async(req,res)=>{
-    const allAtms = await new AtmCollection2({name : req.body.name});
+app.post("/api/Newatm",async(req,res)=>{
+    const allAtms = new AtmCollection2({name: req.body.name,
+        haveCash: req.body.haveCash,
+        working: req.body.working,
+        country: req.body.country,
+        city: req.body.city,
+        address: req.body.address,
+        loc: {
+            type: req.body.type,
+            coordinates: [req.body.latitude, req.body.longitude]
+        }
+
+    });
     allAtms.save();
     res.send(allAtms);
 });
 
-app.put("/:id",async(req,res)=>{
+app.put("/updateAtm/:id",async(req,res)=>{
     const atm = await AtmCollection2.findByIdAndUpdate(req.params.id,{name:req.body.name},{new:true});
     
     if (!atm) return res.status(404).send('The ATM with the specific ID is not found!');
