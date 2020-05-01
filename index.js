@@ -45,7 +45,7 @@ AtmCollection2.create({
 });
 */
 
-app.get("/api/singleAtm/:id", (req, res) => {
+app.get("/api/singleAtm/:id", (req, res) =>{
     const singleAtm = AtmCollection2.findById(req.params.id);
     if (!singleAtm) return res.status(404).send("The ATM with the specific ID is not found!!");
     res.send(singleAtm);
@@ -77,14 +77,19 @@ app.post("/api/Newatm",async(req,res)=>{
 });
 
 app.put("/updateAtm/:id",async(req,res)=>{
-    const atm = await AtmCollection2.findByIdAndUpdate(req.params.id,{name:req.body.name},{new:true});
+    const atm = await AtmCollection2.findByIdAndUpdate(req.params.id,{name: req.body.name,
+        haveCash: req.body.haveCash,
+        working: req.body.working,
+        country: req.body.country,
+        city: req.body.city,
+        address: req.body.address},{new:true});
     
     if (!atm) return res.status(404).send('The ATM with the specific ID is not found!');
     res.send(atm)
 });
 
-app.delete("/:id",async(req,res)=>{
-    const atm =await AtmCollection2.findByIdAndRemove(req.body.name);
+app.delete("/deleteAtm/:id",async(req,res)=>{
+    const atm =await AtmCollection2.findByIdAndRemove(req.params.id);
     if (!atm) return res.status(404).send('The ATM with the specific ID is not found!');
     res.send(atm)
 });
