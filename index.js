@@ -34,7 +34,7 @@ app.get("/api/singleAtm/:id", async (req, res) => {
   res.send(singleAtm);
 });
 
-app.get("/api/atms", async (req, res) => {
+app.get("/", async (req, res) => {
   const allAtms = await AtmCollection2.find();
   res.send(allAtms);
 });
