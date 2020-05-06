@@ -47,30 +47,41 @@ app.post("/api/Newatm", async (req, res) => {
         minimum: 3,
         message: "must be at least 6 characters",
       },
+      format: {
+        pattern: "[a-z0-9]+",
+        flags: "i",
+        message: "can only contain a-z and 0-9",
+      },
+    },
+    country: {
+      inclusion: {
+        within: { Iraq: "IQ", Egypt: "EG", Emirates: "AE" },
+        message: "^We're not providing services to %{value}",
+      },
     },
   };
-  const check = validate(req.body, constraints);
+  const check = validate(req.body.name, constraints);
   console.log(check);
 
   if (check.error) {
-    res.status(400).send(res.error);
+    res.status(400).send(res.check.error);
     return;
+  } else {
+    const allAtms = new AtmCollection2({
+      name: req.body.name,
+      haveCash: req.body.haveCash,
+      working: req.body.working,
+      country: req.body.country,
+      city: req.body.city,
+      address: req.body.address,
+      loc: {
+        type: req.body.type,
+        coordinates: [req.body.latitude, req.body.longitude],
+      },
+    });
+    allAtms.save();
+    res.send(allAtms);
   }
-
-  const allAtms = new AtmCollection2({
-    name: req.body.name,
-    haveCash: req.body.haveCash,
-    working: req.body.working,
-    country: req.body.country,
-    city: req.body.city,
-    address: req.body.address,
-    loc: {
-      type: req.body.type,
-      coordinates: [req.body.latitude, req.body.longitude],
-    },
-  });
-  allAtms.save();
-  res.send(allAtms);
 });
 
 app.put("/updateAtm/:id", async (req, res) => {
